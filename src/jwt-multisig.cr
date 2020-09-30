@@ -13,10 +13,47 @@ module JWT
       end
     end
 
+    def self.verify_jwt(jwt, public_keychain)
+      proxy_exception JWT::DecodeError do
+        keychain           = public_keychain
+        serialized_payload = base64_decode(jwt["payload"].to_s)
+        payload            = JSON.parse(serialized_payload)
+        verified           = [] of String | Symbol
+        unverified         = [] of String | Symbol
+
+        jwt["signatures"].as_a.each do |jws|
+          key_id = jws["header"]["kid"].to_s
+          puts keychain, key_id
+          if keychain.has_key?(key_id)
+            verify_jws(jws, payload, public_keychain)
+            verified << key_id
+          else
+            unverified << key_id
+          end
+        end
+        { payload:    payload,
+          verified:   verified.uniq,
+          unverified: unverified.uniq }
+      end
+    end
+
+    def self.verify_jws(jws, payload, public_keychain)
+      proxy_exception JWT::DecodeError do
+        encoded_header     = jws["protected"].to_s
+        serialized_header  = base64_decode(encoded_header)
+        serialized_payload = payload.to_json
+        encoded_payload    = base64_encode(serialized_payload)
+        signature          = jws["signature"].to_s
+        public_key         = public_keychain[jws["header"]["kid"].to_s]
+        jwt                = [encoded_header, encoded_payload, signature].join(".")
+        algorithm          = JSON.parse(serialized_header)["alg"].to_s
+        JWT.decode(jwt, public_key, JWT::Algorithm::RS256).first
+      end
+    end
+
     def self.generate_jws(payload, key_id, key_value, algorithm)
       proxy_exception JWT::Error do
         jwt = JWT.encode(payload, key_value, algorithm).split(".")
-        puts jwt
         { protected: jwt[0],
           header:    { kid: key_id },
           signature: jwt[2] }
