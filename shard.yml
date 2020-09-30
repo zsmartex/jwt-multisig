@@ -1,0 +1,18 @@
+name: jwt-multisig
+version: 1.0.0
+
+authors:
+  - Hữu Hà <business@zsmart.tech>
+
+# description: |
+#   Short description of jwt-multisig
+
+dependencies:
+  jwt:
+    github: crystal-community/jwt
+
+# development_dependencies:
+#   webmock:
+#     github: manastech/webmock.cr
+
+# license: MIT
