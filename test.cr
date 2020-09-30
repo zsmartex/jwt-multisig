@@ -16,11 +16,11 @@ algorithms = {
   :applogic => JWT::Algorithm::RS256
 }
 
-# jwt = JWT.encode(payload, private_keychain[:applogic], algorithms[:applogic]).split(".")
+jwt = JWT.encode(payload, private_keychain[:applogic], algorithms[:applogic]).split(".")
 
 jwt = JWT::Multisig.generate_jwt(payload, private_keychain, algorithms)
 
-puts jwt
+puts jwt.to_json
 
 # payload_base64 = JWT::Multisig.base64_encode(payload.to_json)
 # puts JWT::Multisig.base64_decode(payload_base64)

@@ -18,7 +18,7 @@ module JWT
         jwt = JWT.encode(payload, key_value, algorithm).split(".")
         { protected: jwt[0],
           header:    { kid: key_id },
-          signature: jwt[1] }
+          signature: jwt[2] }
       end
     end
 
