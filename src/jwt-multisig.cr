@@ -16,6 +16,7 @@ module JWT
     def self.generate_jws(payload, key_id, key_value, algorithm)
       proxy_exception JWT::Error do
         jwt = JWT.encode(payload, key_value, algorithm).split(".")
+        puts jwt
         { protected: jwt[0],
           header:    { kid: key_id },
           signature: jwt[2] }
